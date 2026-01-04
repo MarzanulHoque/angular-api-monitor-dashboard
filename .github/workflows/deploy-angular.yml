@@ -12,6 +12,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: angular-api-monitor-dashboard
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,11 +29,10 @@ jobs:
         run: npm install
 
       - name: Build Angular app
-        run: |
-          npm run build -- --configuration=production --base-href=/angular-api-monitor-dashboard/
+        run: npm run build -- --configuration=production --base-href=/angular-api-monitor-dashboard/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist/angular-api-monitor-dashboard
+          publish_dir: angular-api-monitor-dashboard/dist/angular-api-monitor-dashboard
