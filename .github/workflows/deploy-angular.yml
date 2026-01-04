@@ -35,4 +35,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./angular-api-monitor-dashboard/dist/angular-api-monitor-dashboard
+          publish_dir: ./angular-api-monitor-dashboard/angular-api-monitor-dashboard
