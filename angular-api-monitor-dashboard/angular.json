@@ -7,7 +7,13 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
+          "path": "src/app/components",
+          "skipTests": false,
           "style": "scss"
+        },
+        "@schematics/angular:service": {
+          "path": "src/app/services"
+          
         }
       },
       "root": "",
