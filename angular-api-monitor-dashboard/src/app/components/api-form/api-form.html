@@ -1,1 +1,20 @@
-<p>api-form works!</p>
+<form [formGroup]="apiForm" (ngSubmit)="onSave()">
+  <div>
+    <label for="">Name:</label>
+    <input formControllerName="name" placeholder="API Name" />
+    <div *ngIf="apiForm.get('name')?.invalid && apiForm.get('name').?touched">Name is required</div>
+  </div>
+  <div>
+    <label>URL:</label>
+    <input formControlName="url" placeholder="https://api.example.com" />
+    <div *ngIf="apiForm.get('url')?.invalid && apiForm.get('url')?.touched">Enter a valid URL.</div>
+  </div>
+  <div>
+    <label>JWT Token (optional):</label>
+    <input formControlName="token" placeholder="Bearer token if required" />
+  </div>
+  <div style="margin-top: 10px">
+    <button type="submit" [disabled]="!apiForm.valid">Save</button>
+    <button type="button" (click)="onCancel()">Cancel</button>
+  </div>
+</form>
