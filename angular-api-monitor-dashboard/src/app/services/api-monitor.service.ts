@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { DestroyRef ,inject,Injectable } from '@angular/core';
 import { ApiItem } from '../models/apiItems';
 import { BehaviorSubject, interval } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -13,10 +14,15 @@ export class ApiMonitorService {
   private apiList: ApiItem[] = [];
   private apiList$ = new BehaviorSubject<ApiItem[]>([]);
 
-  constructor(private http:HttpClient)
+  private destroyref = inject(DestroyRef);
+
+  constructor(private http: HttpClient)
   {
     this.loadFromStorage();
-    interval(10000).subscribe(() => this.pollApis());
+
+      interval(10000)
+          .pipe(takeUntilDestroyed(this.destroyref))
+          .subscribe(() => this.pollApis());
   }
 
   private loadFromStorage() {
@@ -26,7 +32,7 @@ export class ApiMonitorService {
       const now = Date.now();
       this.apiList = list.filter(item => (now - (item.addedAt || now)) < this.EXPIRY_DAYS * 24 * 60 * 60 * 1000);
       this.apiList$.next([...this.apiList]);
-      this.saveToStorage(); // update storage after filtering expired items
+      this.saveToStorage(); 
     }
   }
 
@@ -62,19 +68,32 @@ export class ApiMonitorService {
 
   private pollApis() {
     this.apiList.forEach(api => {
+      
       const start = performance.now();
-      this.http.get(api.url).subscribe({
-        next: () => {
-          api.status = 'success';
-          api.responseTime = Math.round(performance.now() - start);
-          this.apiList$.next([...this.apiList]);
-        },
-        error: () => {
-          api.status = 'failure';
-          api.responseTime = Math.round(performance.now() - start);
-          this.apiList$.next([...this.apiList]);
+      let headers = new HttpHeaders();
+      
+      if(api.token)
+      {
+        headers = headers.set('X-API-TOKEN',api.token);
+      }
+
+      this.http.get(api.url,{headers}).subscribe(
+        {
+          next:() =>{
+            api.status = 'success';
+            api.responseTime = Math.round(performance.now()-start);
+            this.apiList$.next([...this.apiList]);
+            this.saveToStorage();
+          },
+          error:() =>{
+            api.status='failure',
+            api.responseTime = Math.round(performance.now()-start);
+            this.apiList$.next([...this.apiList]);
+            this.saveToStorage();
+          }
         }
-      });
+      )
+    
     });
   }
 

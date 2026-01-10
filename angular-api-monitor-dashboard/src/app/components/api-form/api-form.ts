@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ApiItem } from '../../models/apiItems';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { validate } from '@angular/forms/signals';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule,FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-api-form',
-  imports: [],
+  imports: [CommonModule,ReactiveFormsModule],
   templateUrl: './api-form.html',
   styleUrl: './api-form.scss',
 })
